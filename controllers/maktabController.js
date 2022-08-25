@@ -44,9 +44,19 @@ const getOne = async (req, res, next) => {
 };
 const update = async (req, res, next) => {
   try {
+    const old = await pool.query("select * from maktab where id=$1", [
+      req.params.id,
+    ]);
+
+    console.log(old);
+
     const data = await pool.query(
       "update maktab set name=$1,tuman_id=$2 where maktab.id=$3 returning *",
-      [req.body.name, req.body.tuman_id, req.params.id]
+      [
+        req.body.name || old.rows[0].name,
+        req.body.tuman_id || old.rows[0].tuman_id,
+        req.params.id,
+      ]
     );
     res.status(200).json({
       status: "succes",
